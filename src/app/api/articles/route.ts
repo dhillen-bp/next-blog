@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     // Ambil data dari form
     const title = formData.get("title") as string;
     const content = formData.get("content");
-    const categories = formData.getAll("categories"); // Bisa berbentuk array
+    const categories = [formData.get("categories")].filter(Boolean); // Bisa berbentuk array
     const file = formData.get("thumbnail");
 
     // Validasi input

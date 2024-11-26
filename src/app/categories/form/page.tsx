@@ -1,4 +1,4 @@
-"use client";
+"use client";;
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
@@ -7,12 +7,6 @@ import { toast } from "react-toastify";
 const CreateCategoryPage = () => {
     const [name, setName] = useState("");
     const [icon, setIcon] = useState<File | null>(null);
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        createCategory();
-    };
 
     const createCategory = async () => {
         const formData = new FormData();
@@ -40,6 +34,11 @@ const CreateCategoryPage = () => {
         }
     }
 
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        createCategory();
+    };
+
     return (
         <div className="py-16 px-6 md:px-16">
             <h2 className="text-4xl font-bold inline-block relative">
@@ -56,16 +55,18 @@ const CreateCategoryPage = () => {
                         placeholder="Category Name..."
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                        className="block w-full px-4 py-2 text-sm font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-full placeholder-gray-400 focus:outline-none leading-relaxed"
                     />
                 </div>
 
                 <div className="grid w-full max-w-sm items-center gap-3 mb-8">
                     <Label htmlFor="icon">Icon</Label>
-                    <Input
+                    <input
                         id="icon"
                         name="icon"
                         type="file"
                         onChange={(e) => setIcon(e.target.files?.[0] || null)}
+                        className="block w-full px-4 py-2 text-sm font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-full placeholder-gray-400 focus:outline-none leading-relaxed file:bg-green-50 file:rounded-full file:border-0 file:py-1 file:px-6"
                     />
                 </div>
 

@@ -30,7 +30,6 @@ articleSchema.pre("validate", function (next) {
   if (this.title && !this.slug) {
     this.slug = slug(this.title);
   }
-  console.log("Slug before validation:", this.slug); // Debugging slug
   next();
 });
 

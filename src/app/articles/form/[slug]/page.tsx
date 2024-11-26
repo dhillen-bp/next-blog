@@ -5,23 +5,23 @@ import { Editor } from '@tinymce/tinymce-react';
 import { Editor as TinyMCEEditor } from 'tinymce';
 import { ICategory } from '@/models/Category';
 import { toast } from 'react-toastify';
+import { useParams, useRouter } from "next/navigation";
 
 const API_KEY_TYNYMCE = process.env.NEXT_PUBLIC_TINYMCE_API_KEY;
 
-const CreateArticlePage = () => {
+const EditArticlePage = () => {
+    const params = useParams();
+    const router = useRouter();
+
     const [categories, setCategories] = useState<ICategory[]>([]);
     const [selectedCategory, setSelectedCategory] = useState("");
     const [title, setTitle] = useState("");
     const [thumbnail, setThumbnail] = useState<File | null>(null);
+    const [currentThumbnailUrl, setCurrentThumbnailUrl] = useState<string | null>(null);
     const [content, setContent] = useState("");
 
     const editorRef = useRef<TinyMCEEditor | null>(null);
     const thumbnailInputRef = useRef<HTMLInputElement | null>(null)
-    const log = () => {
-        if (editorRef.current) {
-            console.log(editorRef.current.getContent());
-        }
-    };
 
     const getCategories = async () => {
         try {
@@ -36,10 +36,33 @@ const CreateArticlePage = () => {
         }
     };
 
-    const createArticle = async () => {
+    const getArticle = async () => {
+        try {
+            const response = await fetch(`/api/articles/${params.slug}`);
+            if (response.ok) {
+                const data = await response.json();
+                setTitle(data.title || "");
+                setSelectedCategory(data.categories || "");
+                setCurrentThumbnailUrl(data.thumbnail || null);
+                setContent(data.content || "");
+
+                // Tunggu data content di-update sebelum mengatur editor
+                if (editorRef.current) {
+                    editorRef.current.setContent(data.content || "");
+                }
+            } else {
+                toast.error("Failed to fetch category.");
+            }
+        } catch (error) {
+            console.error("Error fetching article:", error);
+        }
+    };
+
+
+    const updateArticle = async () => {
         const formData = new FormData();
         formData.append("title", title);
-        formData.append("category", selectedCategory);
+        formData.append("categories", selectedCategory);
         if (thumbnail) formData.append("thumbnail", thumbnail);
 
         if (editorRef.current) {
@@ -48,49 +71,45 @@ const CreateArticlePage = () => {
         }
 
         try {
-            const response = await fetch("/api/articles", {
-                method: "POST",
+            const response = await fetch(`/api/articles/${params.slug}`, {
+                method: "PUT",
                 body: formData,
             });
 
+            console.log("response: ", response);
+
             if (!response.ok) {
                 const { message } = await response.json();
-                toast.error(`${message}`);
+                toast.error(`Error: ${message}`);
                 return;
             }
 
-            toast.success("Article created successfully!");
-            setTitle("");
-            setSelectedCategory("");
-            if (thumbnailInputRef.current) {
-                thumbnailInputRef.current.value = "";
-            }
-            // Clear TinyMCE editor content
-            if (editorRef.current) {
-                editorRef.current.setContent("");
-            }
+            const updatedArticle = await response.json();
+
+            toast.success("Category updated successfully!");
+            router.push(`/articles/form/${updatedArticle.slug}`);
         } catch (error) {
-            console.error("Error creating category:", error);
-            toast.error("Failed to create articel.");
+            toast.error("Failed to update category.");
         }
     }
 
     useEffect(() => {
         getCategories();
-    }, []);
+        getArticle();
+    }, [params.slug]);
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         if (editorRef.current) {
             setContent(editorRef.current.getContent());
         }
-        await createArticle();
+        await updateArticle();
     };
 
     return (
         <div className="py-16 px-6 md:px-16">
             <h2 className="text-4xl font-bold inline-block relative">
-                Create Article
+                Edit Article
                 <span className="absolute left-0 -bottom-1 w-full h-[10px] -z-[1] bg-gradient-to-r from-green-500 to-blue-500"></span>
             </h2>
 
@@ -130,7 +149,16 @@ const CreateArticlePage = () => {
                     <label className="flex items-center mb-2 text-gray-600 text-sm font-medium">Thumbnail <svg width="7" height="7" className="ml-1" viewBox="0 0 7 7" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M3.11222 6.04545L3.20668 3.94744L1.43679 5.08594L0.894886 4.14134L2.77415 3.18182L0.894886 2.2223L1.43679 1.2777L3.20668 2.41619L3.11222 0.318182H4.19105L4.09659 2.41619L5.86648 1.2777L6.40838 2.2223L4.52912 3.18182L6.40838 4.14134L5.86648 5.08594L4.09659 3.94744L4.19105 6.04545H3.11222Z" fill="#EF4444"></path></svg>
                     </label>
-                    <input type="file" ref={thumbnailInputRef} name='thumbnail' id="default-search" className="block w-full px-4 py-2 text-sm font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-full placeholder-gray-400 focus:outline-none leading-relaxed file:bg-green-50 file:rounded-full file:border-0 file:py-1 file:px-6" required
+                    {currentThumbnailUrl && !thumbnail && (
+                        <div className="mb-4">
+                            <img
+                                src={`/${currentThumbnailUrl.replace(/\\/g, "/")}`}
+                                alt="Current Thumbnail"
+                                className="w-56 h-5w-56 object-cover border border-gray-300 rounded"
+                            />
+                        </div>
+                    )}
+                    <input type="file" ref={thumbnailInputRef} name='thumbnail' id="default-search" className="block w-full px-4 py-2 text-sm font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-full placeholder-gray-400 focus:outline-none leading-relaxed file:bg-green-50 file:rounded-full file:border-0 file:py-1 file:px-6"
                         onChange={(e) => setThumbnail(e.target.files?.[0] || null)}
                     />
                 </div>
@@ -163,7 +191,7 @@ const CreateArticlePage = () => {
                 </button>
             </form>
         </div>
-    )
+    );
 }
 
-export default CreateArticlePage
+export default EditArticlePage

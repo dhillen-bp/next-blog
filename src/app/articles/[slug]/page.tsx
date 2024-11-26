@@ -33,7 +33,7 @@ const ArticleDetailPage = () => {
     const getRecentArticles = async () => {
         try {
             if (!params?.slug) throw new Error("Invalid slug");
-            const response = await fetch(`/api/articles/recent?exclude=${params.slug}`);
+            const response = await fetch(`/api/articles/recent?exclude=${params.slug}&limit=6`);
             if (!response.ok) {
                 throw new Error("Failed to fetch recent articles");
             }
@@ -81,32 +81,35 @@ const ArticleDetailPage = () => {
                         Recent Articles
                         <span className="absolute left-0 bottom-[5px] w-full h-[6px] -z-[1] bg-gradient-to-r from-green-500 to-blue-500"></span>
                     </h2>
-                    <div>
+                    <div className="space-y-8">
                         {recentArticles.map((recent) => (
                             <Link href={`/articles/${recent.slug}`} className="flex gap-4 group cursor-pointer">
-                                <div className="overflow-hidden rounded-xl h-[100px] w-[160px]"
-                                    key={recent.slug}>
+                                <div
+                                    className="overflow-hidden rounded-xl h-[100px] w-[160px] flex-shrink-0"
+                                    key={recent.slug}
+                                >
                                     <Image
                                         src={`/${recent.thumbnail.replace(/\\/g, "/")}`}
                                         alt="Thumbnail"
                                         width={1920}
                                         height={1080}
-                                        className="object-cover rounded-xl group-hover:scale-105 w-full h-full transition-transform duration-300"
+                                        className="object-cover rounded-xl w-full h-full group-hover:scale-105 transition-transform duration-300"
                                     />
                                 </div>
                                 <div className="space-y-3 flex justify-center flex-col">
-                                    <span className="text-sm opacity-60">
+                                    <span className="text-xs opacity-60">
                                         {new Date(recent.createdAt).toLocaleDateString('en-EN', {
                                             day: '2-digit',
                                             month: 'long',
                                             year: 'numeric',
                                         })}
                                     </span>
-                                    <h6 className="font-semibold text-lg group-hover:text-blue-500 transition-colors duration-300">
+                                    <h6 className="font-semibold text-sm group-hover:text-blue-500 transition-colors duration-300">
                                         {recent?.title}
                                     </h6>
                                 </div>
                             </Link>
+
                         ))}
                     </div>
                 </div>

@@ -6,13 +6,14 @@ export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
     const slugToExclude = url.searchParams.get("exclude");
+    const limit = parseInt(url.searchParams.get("limit") || "3", 10); // Default to 3
 
     await dbConnect();
     const recentArticles = await Article.find(
       slugToExclude ? { slug: { $ne: slugToExclude } } : {}
     )
       .sort({ createdAt: -1 }) // Sort by creation date
-      .limit(5); // Limit to 5 recent articles
+      .limit(limit); // Limit the number of articles
 
     return NextResponse.json(recentArticles);
   } catch (error) {
