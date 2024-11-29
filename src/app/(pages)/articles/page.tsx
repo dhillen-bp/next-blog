@@ -1,18 +1,15 @@
 "use client";
 import ArticleCard from "@/components/ArticleCard";
 import { IArticle } from "@/models/Article";
-import { useParams } from "next/navigation";
 import { useEffect, useState } from 'react';
 
-const ArtcilesCategoryPage = () => {
+const ArticlesPage = () => {
     const [articles, setArticles] = useState<IArticle[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const params = useParams();
 
     const getArticles = async () => {
         try {
-            if (!params?.category) throw new Error("Invalid category");
-            const response = await fetch(`/api/articles/category/${params.category}`);
+            const response = await fetch("/api/articles");
             if (!response.ok) {
                 throw new Error("Failed to fetch articles");
             }
@@ -27,7 +24,8 @@ const ArtcilesCategoryPage = () => {
 
     useEffect(() => {
         getArticles();
-    }, [params.category]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [getArticles]);
 
     if (loading) {
         return (
@@ -46,6 +44,6 @@ const ArtcilesCategoryPage = () => {
             </div>
         </div>
     );
-}
+};
 
-export default ArtcilesCategoryPage
+export default ArticlesPage;

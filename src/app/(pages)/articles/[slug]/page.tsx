@@ -21,7 +21,6 @@ const ArticleDetailPage = () => {
             }
             const data: IArticle = await response.json();
             setArticle(data);
-            console.log(data);
 
         } catch (error) {
             console.error("Error fetching article:", error);
@@ -83,10 +82,9 @@ const ArticleDetailPage = () => {
                     </h2>
                     <div className="space-y-8">
                         {recentArticles.map((recent) => (
-                            <Link href={`/articles/${recent.slug}`} className="flex gap-4 group cursor-pointer">
+                            <Link href={`/articles/${recent.slug}`} className="flex gap-4 group cursor-pointer" key={recent._id}>
                                 <div
                                     className="overflow-hidden rounded-xl h-[100px] w-[160px] flex-shrink-0"
-                                    key={recent.slug}
                                 >
                                     <Image
                                         src={`/${recent.thumbnail.replace(/\\/g, "/")}`}

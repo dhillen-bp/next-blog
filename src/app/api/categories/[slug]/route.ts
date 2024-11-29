@@ -105,18 +105,14 @@ export async function PUT(
     return NextResponse.json(category, { status: 200 }); // Success response
   } catch (error) {
     console.error("Error updating category:", error);
-    return NextResponse.json(
-      { message: "Failed to update category" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Error: ", error }, { status: 500 });
   }
 }
 
 export async function DELETE({ params }: { params: { slug: string } }) {
+  const { slug } = params;
   try {
     await dbConnect();
-
-    const { slug } = params;
 
     const category = await Category.findOne({ slug });
     if (!category) {

@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useParams } from "next/navigation";
+import Image from "next/image";
 
 const EditCategoryPage = () => {
     const params = useParams();
@@ -69,7 +70,7 @@ const EditCategoryPage = () => {
         if (params.slug) {
             getCategory();
         }
-    }, [slug]);
+    }, [slug, getCategory]);
 
     return (
         <div className="py-16 px-6 md:px-16">
@@ -96,7 +97,7 @@ const EditCategoryPage = () => {
                     {currentIconUrl && !icon && (
                         <div className="mb-4">
                             <p>Current Icon:</p>
-                            <img
+                            <Image
                                 src={`/${currentIconUrl.replace(/\\/g, "/")}`}
                                 alt="Current Icon"
                                 className="w-32 h-32 object-cover border border-gray-300 rounded"

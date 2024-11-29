@@ -1,9 +1,11 @@
+import Image from "next/image"
+
 const AboutPage = () => {
     return (
         <div className="sm:flex items-center max-w-screen-xl">
             <div className="sm:w-1/2 p-10">
                 <div className="image object-center text-center">
-                    <img src="https://i.imgur.com/WbQnbas.png" />
+                    <Image src="" alt="About" />
                 </div>
             </div>
             <div className="sm:w-1/2 p-5">

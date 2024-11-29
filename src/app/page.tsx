@@ -1,22 +1,13 @@
-"use client"
-
+"use client";
 import HeroCarousel from "@/components/HeroCarousel";
 import { IArticle } from "@/models/Article";
 import { ICategory } from "@/models/Category";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams } from "next/navigation";
 import { useEffect, useState } from 'react';
 
-const categories = [
-  { id: 1, name: 'Food', icon: '🍔' },
-  { id: 2, name: 'Drinks', icon: '🍹' },
-  { id: 3, name: 'Music', icon: '🎵' },
-  { id: 4, name: 'Travel', icon: '✈️' },
-];
-
 export default function Home() {
-  const params = useParams();
+
   const [recentArticles, setRecentArticles] = useState<IArticle[]>([]);
   const [categories, setCategories] = useState<ICategory[]>([]);
 
@@ -90,7 +81,7 @@ export default function Home() {
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {recentArticles.map((article) => (
-            <div className="relative bg-white shadow-md overflow-hidden rounded-xl group">
+            <div className="relative bg-white shadow-md overflow-hidden rounded-xl group" key={article._id}>
               <div className="w-full h-[368px] overflow-hidden rounded-xl">
                 <Image
                   src={`/${article.thumbnail.replace(/\\/g, "/")}`}

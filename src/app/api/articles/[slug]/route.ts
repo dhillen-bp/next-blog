@@ -101,9 +101,6 @@ export async function PUT(
 
     return NextResponse.json(article, { status: 200 }); // Success response
   } catch (error) {
-    return NextResponse.json(
-      { message: "Failed to update article" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Error: ", error }, { status: 500 });
   }
 }
