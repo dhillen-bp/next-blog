@@ -55,7 +55,7 @@ export async function PUT(
 
     if (!article) {
       return NextResponse.json(
-        { message: "Category not found" },
+        { message: "Article not found" },
         { status: 404 }
       );
     }
@@ -101,6 +101,52 @@ export async function PUT(
 
     return NextResponse.json(article, { status: 200 }); // Success response
   } catch (error) {
+    return NextResponse.json({ message: "Error: ", error }, { status: 500 });
+  }
+}
+
+export async function DELETE(
+  req: Request,
+  { params }: { params: { slug: string } }
+) {
+  try {
+    await dbConnect();
+
+    const { slug } = params;
+    console.log("slug:", params.slug);
+
+    if (!slug) {
+      return NextResponse.json(
+        { message: "Article ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const article = await Article.findOne({ slug });
+
+    if (!article) {
+      return NextResponse.json(
+        { message: "Article not found" },
+        { status: 404 }
+      );
+    }
+
+    // Hapus file ikon jika ada
+    if (article.thumbnail && article.thumbnail.startsWith("articles")) {
+      const iconPath = path.join(process.cwd(), "public", article.thumbnail);
+      await fsPromises.unlink(iconPath).catch(() => {
+        console.warn("Failed to delete old thumbnail file:", iconPath);
+      });
+    }
+
+    await article.deleteOne({ slug });
+
+    return NextResponse.json(
+      { message: "Article deleted successfully" },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error deleting article:", error);
     return NextResponse.json({ message: "Error: ", error }, { status: 500 });
   }
 }

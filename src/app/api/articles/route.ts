@@ -4,11 +4,14 @@ import { NextResponse } from "next/server";
 import path from "path";
 import { promises as fsPromises } from "fs";
 import { v4 as uuidv4 } from "uuid";
+import { getTokenFromCookie, verifyToken } from "@/utils/jwt_helper";
 
 export async function GET() {
   try {
     await dbConnect();
-    const articles = await Article.find();
+    const articles = await Article.find()
+      .populate("category", "name")
+      .populate("author");
     return NextResponse.json(articles);
   } catch (error) {
     console.error("Error fetching articles:", error);
@@ -23,14 +26,34 @@ export async function POST(req: Request) {
   try {
     await dbConnect();
 
+    const token = getTokenFromCookie(req);
+
+    if (!token) {
+      return NextResponse.json(
+        { message: "Token not found. Please login." },
+        { status: 401 } // Unauthorized jika tidak ada token
+      );
+    }
+
+    // Verifikasi token dan ambil userId
+    const decodedToken = verifyToken(token);
+    if (!decodedToken) {
+      return NextResponse.json(
+        { message: "Invalid or expired token" },
+        { status: 401 } // Unauthorized jika token tidak valid atau kadaluarsa
+      );
+    }
+
     // Menangani form data
     const formData = await req.formData();
 
     // Ambil data dari form
     const title = formData.get("title") as string;
     const content = formData.get("content");
-    const categories = [formData.get("categories")].filter(Boolean); // Bisa berbentuk array
+    const category = formData.get("category"); // Bisa berbentuk array
     const file = formData.get("thumbnail");
+    const authorId = [String(decodedToken.id)]; // Ambil userId dari decoded token
+    console.log("authorId: ", authorId);
 
     // Validasi input
     if (!title || !content) {
@@ -65,8 +88,11 @@ export async function POST(req: Request) {
       title: title,
       content: content as string,
       thumbnail: path.join("articles", filename), // Menyimpan path relatif thumbnail
-      categories, // Bisa langsung menggunakan array
+      category,
+      author: decodedToken.id,
     });
+
+    console.log("new article: ", newArticle);
 
     await newArticle.save();
 

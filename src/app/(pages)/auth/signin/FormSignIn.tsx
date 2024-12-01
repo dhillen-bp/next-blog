@@ -1,5 +1,5 @@
-"use client"
-
+"use client";
+import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link"
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 
 const FormSignIn = () => {
     const router = useRouter();
+    const { setUser } = useAuth();
 
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
@@ -14,6 +15,7 @@ const FormSignIn = () => {
 
     const signIn = async () => {
         try {
+
             const response = await fetch("/api/auth/signin", {
                 method: "POST",
                 headers: {
@@ -25,20 +27,27 @@ const FormSignIn = () => {
                 }),
             });
 
+            // Jika respon tidak ok (bukan 200), tampilkan error
             if (!response.ok) {
                 const { message } = await response.json();
                 toast.error(`Error: ${message}`);
-                return router.refresh();
+                return router.refresh(); // refresh jika error
             }
 
-            toast.success("Sign In successfully!");
-            router.push("/")
-        } catch (error) {
-            toast.error("Failed to register user.");
-            console.log(error);
+            // Ambil data user dari response
+            const data = await response.json();
 
+            // Update user di AuthContext
+            setUser(data.user);
+
+            toast.success("Sign In successfully!");
+            router.push("/");
+            router.refresh();
+        } catch (error) {
+            toast.error("Failed to sign in.");
         }
-    }
+    };
+
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
@@ -46,8 +55,10 @@ const FormSignIn = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
         signIn();
     };
+
 
     return (
         <form className="bg-white my-8 p-8 rounded-xl shadow-md w-full md:w-1/2" onSubmit={handleSubmit}>
@@ -55,6 +66,7 @@ const FormSignIn = () => {
                 <label htmlFor="email" className="font-semibold">Email</label>
                 <input
                     type="email"
+                    name="email"
                     id="email"
                     placeholder="Your Email..."
                     className="block w-full px-4 py-2 text-sm font-normal rounded-full shadow-xs text-gray-900 bg-transparent border border-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed"
@@ -67,6 +79,7 @@ const FormSignIn = () => {
                 <div className="relative">
                     <input
                         type={showPassword ? "text" : "password"}
+                        name="password"
                         id="password"
                         placeholder="Your Password..."
                         className="block w-full px-4 py-2 text-sm font-normal rounded-full shadow-xs text-gray-900 bg-transparent border border-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed"

@@ -1,5 +1,7 @@
 import mongoose, { Schema, model, models } from "mongoose";
 import slug from "slug";
+import Category, { ICategory } from "./Category";
+import User, { IUser } from "./User";
 
 export interface IArticle {
   _id: string;
@@ -7,7 +9,9 @@ export interface IArticle {
   slug: string;
   content: string;
   thumbnail: string;
-  categories: mongoose.Schema.Types.ObjectId[]; // Referensi ke kategori
+  // categories: mongoose.Schema.Types.ObjectId[] | ICategory[]; // Referensi ke kategori
+  category: ICategory; // Referensi ke kategori
+  author: IUser;
   createdAt: Date;
   updatedAt?: Date;
 }
@@ -18,9 +22,16 @@ const articleSchema = new Schema<IArticle>(
     slug: { type: String, unique: true, required: true },
     content: { type: String, required: true },
     thumbnail: { type: String, required: true },
-    categories: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "Category" }, // Referensi ke model Category
-    ],
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: Category,
+      required: true,
+    },
+    author: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: User,
+      required: true,
+    },
   },
   { timestamps: true }
 );

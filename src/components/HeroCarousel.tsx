@@ -53,7 +53,7 @@ const HeroCarousel = ({ recentArticles }: { recentArticles: IArticle[] }) => {
                                             height={40}
                                             className="h-10 w-10 rounded-full"
                                         />
-                                        <span>Author</span>
+                                        <span>{article.author.name}</span>
                                     </div>
 
                                     <Separator orientation="vertical" className="bg-white h-10 mx-3" />

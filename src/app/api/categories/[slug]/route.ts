@@ -109,22 +109,49 @@ export async function PUT(
   }
 }
 
-export async function DELETE({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+export async function DELETE(
+  req: Request,
+  { params }: { params: { slug: string } }
+) {
   try {
     await dbConnect();
 
+    const { slug } = params;
+    console.log("slug:", params.slug);
+
+    if (!slug) {
+      return NextResponse.json(
+        { message: "Category ID is required" },
+        { status: 400 }
+      );
+    }
+
     const category = await Category.findOne({ slug });
+    console.log("api category: ", category);
+
     if (!category) {
       return NextResponse.json(
         { message: "Category not found" },
         { status: 404 }
       );
     }
-  } catch (error) {
+
+    // Hapus file ikon jika ada
+    if (category.icon && category.icon.startsWith("icons")) {
+      const iconPath = path.join(process.cwd(), "public", category.icon);
+      await fsPromises.unlink(iconPath).catch(() => {
+        console.warn("Failed to delete old icon file:", iconPath);
+      });
+    }
+
+    await category.deleteOne({ slug });
+
     return NextResponse.json(
-      { message: "Failed to delete category" },
-      { status: 500 }
+      { message: "Category deleted successfully" },
+      { status: 200 }
     );
+  } catch (error) {
+    console.error("Error deleting category:", error);
+    return NextResponse.json({ message: "Error: ", error }, { status: 500 });
   }
 }

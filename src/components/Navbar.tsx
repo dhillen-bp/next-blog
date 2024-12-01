@@ -35,12 +35,13 @@ const Navbar = () => {
         router.push("/auth/signin"); // Redirect ke halaman sign-in
 
     };
-    // console.log(user);
+
+    // console.log("navbar user: ", user);
 
     return (
         <Menubar className="py-8 px-6 md:px-16 flex justify-between items-center shadow-sm bg-white z-[999]">
             <div className="flex items-center">
-                <Image src="/images/artia-logo.png" width={100} height={100} alt="Logo" className="w-[80px]  md:w-[90px] md:h-auto" />
+                <Image src="/images/artia-logo.png" width={100} height={100} alt="Logo" className="w-[80px]  md:w-[90px] md:h-auto" priority={true} />
             </div>
 
             {/* Menu untuk desktop */}
@@ -70,7 +71,7 @@ const Navbar = () => {
 
                         {/* Dropdown Menu */}
                         {isOpen && (
-                            <div className="absolute right-0 mt-2 bg-white shadow-lg rounded-xl w-48 border overflow-hidden">
+                            <div className="absolute right-0 mt-2 bg-white shadow-lg rounded-xl w-48 border overflow-hidden z-10">
                                 <div className="overflow-hidden">
                                     <Link href="/profile" className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100">
                                         Profile

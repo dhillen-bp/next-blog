@@ -25,7 +25,7 @@ const ArticlesPage = () => {
     useEffect(() => {
         getArticles();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [getArticles]);
+    }, []);
 
     if (loading) {
         return (

@@ -36,8 +36,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setUser(data);
         } catch (error) {
             // Tangani jika terjadi kesalahan pada API call tanpa menampilkan error di console
-            console.log("error: ", error);
-
             setUser(null);
         } finally {
             setLoading(false); // Selesaikan loading
@@ -52,6 +50,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (loading) {
         return null; // Bisa diganti dengan loading spinner jika diperlukan
     }
+    // console.log("context user: ", user);
 
     return (
         <AuthContext.Provider value={{ user, setUser }}>

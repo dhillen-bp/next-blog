@@ -15,12 +15,14 @@ export async function POST(request: Request) {
     // Periksa apakah email terdaftar
     const user = await User.findOne({ email });
     if (!user) {
+      // Kembalikan error 401 jika email tidak ditemukan
       return NextResponse.json({ message: "Invalid email" }, { status: 401 });
     }
 
     // Periksa password
     const isPasswordValid = await compareSync(password, user.password);
     if (!isPasswordValid) {
+      // Kembalikan error 401 jika password salah
       return NextResponse.json(
         { message: "Invalid password" },
         { status: 401 }
@@ -34,22 +36,29 @@ export async function POST(request: Request) {
       { expiresIn: "1h" }
     );
 
-    // Buat respon dengan cookie
+    // Buat response dengan token
     const response = NextResponse.json(
-      { message: "Login successful" },
+      {
+        message: "Login successful",
+        user: {
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+      },
       { status: 200 }
     );
 
-    // Set cookie HttpOnly
+    // Set cookie HttpOnly untuk token
     response.cookies.set("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Hanya gunakan secure di production
-      sameSite: "strict", // Menghindari CSRF
+      secure: process.env.NODE_ENV === "production", // Hanya secure di production
+      sameSite: "strict", // Untuk menghindari CSRF
       maxAge: 3600, // 1 jam
     });
 
     return response;
   } catch (error) {
-    return NextResponse.json({ message: "Error: ", error }, { status: 500 });
+    return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
