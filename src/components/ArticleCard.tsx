@@ -18,13 +18,17 @@ const ArticleCard = ({ article }: { article: IArticle }) => {
                 />
             </div>
             <div className="flex flex-col justify-between space-y-3">
-                <span className="text-sm text-gray-500 mt-3">
-                    {new Date(article.createdAt).toLocaleDateString("en-EN", {
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
-                    })}
-                </span>
+                <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-500 mt-3">
+                        {new Date(article.createdAt).toLocaleDateString("en-EN", {
+                            day: "2-digit",
+                            month: "long",
+                            year: "numeric",
+                        })}
+                    </span>
+                    <span className='bg-blue-50 text-blue-500 border border-blue-400 text-xs font-medium mt-3 px-1.5 rounded-full py-1'>{article.category.name}</span>
+
+                </div>
                 <h2 className="text-2xl font-bold">{article.title}</h2>
                 <p
                     className="text-md text-gray-700 line-clamp-3"

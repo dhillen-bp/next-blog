@@ -2,14 +2,38 @@ import Category from "@/models/Category";
 import { dbConnect } from "@/utils/db";
 import path from "path";
 import { promises as fsPromises } from "fs";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     await dbConnect();
-    const categories = await Category.find();
-    return NextResponse.json(categories);
+
+    const urlParams = new URL(request.url).searchParams;
+    const search = urlParams.get("search") || "";
+    const page = parseInt(urlParams.get("page") || "1", 10);
+    const limit = parseInt(urlParams.get("limit") || "10", 10);
+
+    // Jika ada query search, tambahkan filter pada pencarian
+    const query = search ? { name: { $regex: search, $options: "i" } } : {};
+
+    // Hitung jumlah total kategori untuk pagination
+    const totalItems = await Category.countDocuments(query);
+
+    // Ambil data dengan skip dan limit untuk paginasi
+    const categories = await Category.find(query)
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    return NextResponse.json({
+      categories,
+      pagination: {
+        totalItems,
+        page,
+        limit,
+        totalPages: Math.ceil(totalItems / limit),
+      },
+    });
   } catch (error) {
     console.error("Error fetching categories:", error);
     return NextResponse.json(

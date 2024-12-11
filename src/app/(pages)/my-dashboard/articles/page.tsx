@@ -10,13 +10,15 @@ import { useRouter } from "next/navigation";
 
 const ArticleTablePage = () => {
     const router = useRouter();
+
+    const [searchQuery, setSearchQuery] = useState("");
     const [articles, setArticle] = useState<IArticle[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<string | null>(null);
 
-    const getAllArticles = async () => {
+    const getAllArticles = async (query = "") => {
         try {
-            const response = await fetch("/api/articles");
+            const response = await fetch(`/api/articles/my?search=${query}`);
             if (!response.ok) {
                 throw new Error("Failed to fetch articles");
             }
@@ -40,14 +42,14 @@ const ArticleTablePage = () => {
     };
 
     const handleDelete = async () => {
-        console.log("selected item: ", selectedItem);
+        // console.log("selected item: ", selectedItem);
 
         if (selectedItem) {
             try {
                 const response = await fetch(`/api/articles/${selectedItem}`, {
                     method: "DELETE",
                 });
-                console.log("response:", response);
+                // console.log("response:", response);
 
                 if (!response.ok) {
                     throw new Error("Failed to delete item");
@@ -68,14 +70,25 @@ const ArticleTablePage = () => {
     };
 
     useEffect(() => {
-        getAllArticles();
-    }, [])
+        const debounceSearch = setTimeout(() => {
+            getAllArticles(searchQuery);
+        }, 300); // Debounce 300ms untuk menghindari terlalu banyak request
+
+        return () => clearTimeout(debounceSearch); // Bersihkan debounce sebelumnya
+    }, [searchQuery])
 
 
     return (
         <div className="w-full space-y-6 px-6 md:px-16">
             <h3>Articles Table</h3>
             <Link href="/my-dashboard/articles/form" className="bg-blue-500 flex justify-center items-center w-fit px-3 py-1.5 rounded-full text-sm text-white">Create Article</Link>
+            <input
+                type="text"
+                placeholder="Search articles..."
+                className="border px-4 py-2 rounded-lg"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+            />
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -89,6 +102,7 @@ const ArticleTablePage = () => {
                 <TableBody>
 
                     {articles.map((article, index) => (
+
                         <TableRow key={article._id}>
                             <TableCell className="font-medium">{index + 1}</TableCell>
                             <TableCell>{article.title}</TableCell>

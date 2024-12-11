@@ -19,10 +19,8 @@ export async function GET(
     }
 
     const articles = await Article.find({
-      categories: category._id, // Gunakan ID dari kategori
-    }).populate("categories");
-
-    console.log(articles);
+      category: category._id, // Gunakan ID dari kategori
+    }).populate("category");
 
     return NextResponse.json(articles);
   } catch (error) {

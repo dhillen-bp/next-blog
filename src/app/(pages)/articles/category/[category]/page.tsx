@@ -16,8 +16,10 @@ const ArtcilesCategoryPage = () => {
             if (!response.ok) {
                 throw new Error("Failed to fetch articles");
             }
-            const data: IArticle[] = await response.json();
+            const data = await response.json();
             setArticles(data);
+            console.log("data: ", data);
+
         } catch (error) {
             console.error("Error fetching articles:", error);
         } finally {
@@ -27,7 +29,7 @@ const ArtcilesCategoryPage = () => {
 
     useEffect(() => {
         getArticles();
-    }, [params.category, getArticles]);
+    }, [params.category]);
 
     if (loading) {
         return (

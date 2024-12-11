@@ -1,15 +1,21 @@
 import Article from "@/models/Article";
 import { dbConnect } from "@/utils/db";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 import { promises as fsPromises } from "fs";
 import { v4 as uuidv4 } from "uuid";
 import { getTokenFromCookie, verifyToken } from "@/utils/jwt_helper";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     await dbConnect();
-    const articles = await Article.find()
+
+    const { search } = Object.fromEntries(new URL(request.url).searchParams);
+
+    // Jika ada query search, tambahkan filter pada pencarian
+    const query = search ? { name: { $regex: search, $options: "i" } } : {};
+
+    const articles = await Article.find(query)
       .populate("category", "name")
       .populate("author");
     return NextResponse.json(articles);
@@ -22,7 +28,7 @@ export async function GET() {
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     await dbConnect();
 

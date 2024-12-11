@@ -93,26 +93,32 @@ export default function Home() {
 
               {/* Elemen Transisi */}
               <div className="absolute left-0 right-0 bottom-0 transform translate-y-full group-hover:translate-y-0 group-hover:bottom-4 transition-transform duration-500 ease-in-out bg-white flex flex-col justify-center mx-4 rounded-xl p-3 shadow-lg">
-                <span className="text-sm text-black">
-                  {new Date(article.createdAt).toLocaleDateString('en-EN', {
-                    day: '2-digit',
-                    month: 'long',
-                    year: 'numeric',
-                  })}
-                </span>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-black">
+                    {new Date(article.createdAt).toLocaleDateString('en-EN', {
+                      day: '2-digit',
+                      month: 'long',
+                      year: 'numeric',
+                    })}
+                  </span>
+                  <span className='bg-blue-50 text-blue-500 border border-blue-400 text-xs font-medium  px-1.5 rounded-full py-1'>{article.category.name}</span>
+                </div>
                 <h4 className="mt-1 text-lg font-semibold text-black">{article.title}</h4>
                 <Link href={`/articles/${article.slug}`} className="text-sm mt-2 px-4 py-2 flex w-1/2 justify-center items-center bg-blue-500 text-white text-center hover:bg-blue-600 rounded-xl transition-all duration-300 ease-in-out">Read More</Link>
               </div>
 
               {/* Elemen Default */}
               <div className="group-hover:hidden absolute bottom-0 left-0 w-full bg-gradient-to-t from-black via-transparent to-transparent p-4">
-                <span className="block text-sm text-white">
-                  {new Date(article.createdAt).toLocaleDateString('en-EN', {
-                    day: '2-digit',
-                    month: 'long',
-                    year: 'numeric',
-                  })}
-                </span>
+                <div className="flex items-center justify-between">
+                  <span className="block text-sm text-white">
+                    {new Date(article.createdAt).toLocaleDateString('en-EN', {
+                      day: '2-digit',
+                      month: 'long',
+                      year: 'numeric',
+                    })}
+                  </span>
+                  <span className='bg-blue-50 text-blue-500 border border-blue-400 text-xs font-medium  px-1.5 rounded-full py-1'>{article.category.name}</span>
+                </div>
                 <h4 className="mt-1 text-lg font-semibold text-white">{article.title}</h4>
               </div>
             </div>

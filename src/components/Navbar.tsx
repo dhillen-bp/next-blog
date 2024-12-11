@@ -6,10 +6,19 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePathname } from "next/navigation";
 
 const Navbar = () => {
     const router = useRouter();
+    const pathname = usePathname();
+
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    const menuItems = [
+        { href: "/", label: "Home" },
+        { href: "/articles", label: "Articles" },
+        { href: "/about", label: "About" },
+    ];
 
     const { user, setUser } = useAuth();
 
@@ -46,15 +55,17 @@ const Navbar = () => {
 
             {/* Menu untuk desktop */}
             <div className="hidden md:flex items-center md:space-x-6 lg:space-x-12">
-                <MenubarMenu>
-                    <Link href={`/`} className="text-slate-950 text-opacity-65 hover:text-opacity-100">Home</Link>
-                </MenubarMenu>
-                <MenubarMenu>
-                    <Link href={`/articles`} className="text-slate-950 text-opacity-65 hover:text-opacity-100">Articles</Link>
-                </MenubarMenu>
-                <MenubarMenu>
-                    <Link href={`/about`} className="text-slate-950 text-opacity-65 hover:text-opacity-100">About</Link>
-                </MenubarMenu>
+                {menuItems.map((item) => (
+                    <MenubarMenu key={item.href}>
+                        <Link
+                            href={item.href}
+                            className={`text-slate-950 text-opacity-65 hover:text-opacity-100 ${pathname === item.href ? "text-opacity-100" : ""
+                                }`}
+                        >
+                            {item.label}
+                        </Link>
+                    </MenubarMenu>
+                ))}
 
                 {user && user?.email != undefined ?
                     <div className="relative">
@@ -90,8 +101,12 @@ const Navbar = () => {
                         )}
                     </div>
                     :
-                    <Link href="/auth/signin" className="flex justify-center items-center px-3 py-1.5 rounded-xl border border-blue-500">
-                        Sign In
+                    <Link
+                        href="/auth/signin"
+                        className="relative flex justify-center items-center px-3 py-1 text-sm rounded-xl border border-blue-500 text-blue-500 overflow-hidden group"
+                    >
+                        <span className="absolute inset-0 bg-blue-500 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-in-out"></span>
+                        <span className="relative z-10 group-hover:text-white">Sign In</span>
                     </Link>
                 }
 
@@ -119,6 +134,49 @@ const Navbar = () => {
             {/* Mobile Menu */}
             {isMobileMenuOpen && (
                 <div className="md:hidden absolute top-16 -left-1 w-full flex flex-col px-6 shadow-sm py-6 space-y-4 z-10 bg-white">
+                    {user && user?.email != undefined ?
+                        <div className="relative">
+                            <Link
+                                href="#"
+                                className="flex items-center space-x-2 bg-blue-300 py-1.5 px-3 rounded-full"
+                                onClick={toggleDropdown} // Toggle dropdown ketika diklik
+                            >
+                                <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm-2 9a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-1a4 4 0 0 0-4-4h-4Z" clipRule="evenodd" />
+                                </svg>
+                                <span className='text-sm'>{user.name}</span>
+                            </Link>
+
+                            {/* Dropdown Menu */}
+                            {isOpen && (
+                                <div className="absolute right-0 mt-2 bg-white shadow-lg rounded-xl w-48 border overflow-hidden z-10">
+                                    <div className="overflow-hidden">
+                                        <Link href="/profile" className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100">
+                                            Profile
+                                        </Link>
+                                        <Link href="/my-dashboard" className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100">
+                                            My Dashboard
+                                        </Link>
+                                        <button
+                                            onClick={handleSignOut}
+                                            className="block w-full text-left px-4 py-2 text-sm text-gray-800 hover:bg-gray-100"
+                                        >
+                                            Sign Out
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        :
+                        <Link
+                            href="/auth/signin"
+                            className="relative flex justify-center items-center px-3 py-1 text-sm rounded-xl border border-blue-500 text-blue-500 overflow-hidden group"
+                        >
+                            <span className="absolute inset-0 bg-blue-500 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-in-out"></span>
+                            <span className="relative z-10 group-hover:text-white">Sign In</span>
+                        </Link>
+                    }
+
                     <MenubarMenu>
                         <Link href={`/`} className="text-slate-950 text-opacity-65 hover:text-opacity-100">Home</Link>
                     </MenubarMenu>
@@ -129,6 +187,7 @@ const Navbar = () => {
                         <Link href={`/about`} className="text-slate-950 text-opacity-65 hover:text-opacity-100">About</Link>
                     </MenubarMenu>
                 </div>
+
             )}
         </Menubar>
     );

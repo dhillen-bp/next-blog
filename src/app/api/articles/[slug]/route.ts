@@ -5,6 +5,7 @@ import path from "path";
 import { promises as fsPromises } from "fs";
 import { v4 as uuidv4 } from "uuid";
 import slugGenerator from "slug";
+import { authenticateUser } from "@/utils/jwt_helper";
 
 export async function GET(
   request: Request,
@@ -113,12 +114,20 @@ export async function DELETE(
     await dbConnect();
 
     const { slug } = params;
-    console.log("slug:", params.slug);
 
     if (!slug) {
       return NextResponse.json(
         { message: "Article ID is required" },
         { status: 400 }
+      );
+    }
+
+    const authResult = await authenticateUser(req);
+
+    if (authResult.error) {
+      return NextResponse.json(
+        { message: authResult.error },
+        { status: authResult.status }
       );
     }
 
