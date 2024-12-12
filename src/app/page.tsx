@@ -27,12 +27,13 @@ export default function Home() {
 
   const getCategories = async () => {
     try {
-      const response = await fetch("/api/categories"); // Endpoint GET categories
+      const response = await fetch("/api/categories");
       if (!response.ok) {
         throw new Error("Failed to fetch categories");
       }
       const data = await response.json();
-      setCategories(data);
+
+      setCategories(data.categories);
     } catch (error) {
       console.error("Error fetching categories:", error);
     }

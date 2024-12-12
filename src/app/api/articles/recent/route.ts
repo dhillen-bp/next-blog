@@ -1,6 +1,5 @@
 import Article from "@/models/Article";
 import { dbConnect } from "@/utils/db";
-import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
@@ -8,7 +7,6 @@ export async function GET(req: Request) {
     const url = new URL(req.url);
     const slugToExclude = url.searchParams.get("exclude");
     const limit = parseInt(url.searchParams.get("limit") || "3", 10); // Default to 3
-    console.log(mongoose.models); // Log semua model yang terdaftar
 
     await dbConnect();
     const recentArticles = await Article.find(
